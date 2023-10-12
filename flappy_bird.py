@@ -30,12 +30,14 @@ scroll_speed = 4
 tiles = math.ceil(screen_width / ground_width) + 1
 print(tiles)
 
-class Bird(pygame.sprite.Sprite): #
+#สร้างตัวละคร
+class Witch(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
 		self.images = []
 		self.index = 0
 		self.counter = 0
+		#สร้าง loop เพื่อให้ตัวละครขยับได้
 		for num in range(1, 4):
 			img = pygame.image.load(f'img/witch{num}.png')
 			self.images.append(img)
@@ -57,11 +59,11 @@ class Bird(pygame.sprite.Sprite): #
 		self.image = self.images[self.index]
 
 
-bird_group = pygame.sprite.Group()
+witch_group = pygame.sprite.Group()
 
-flappy = Bird(100, int(screen_height / 2))
+flappy = Witch(100, int(screen_height / 2))
 
-bird_group.add(flappy) #
+witch_group.add(flappy)
 
 
 run = True
@@ -72,8 +74,8 @@ while run:
 	#draw background
 	screen.blit(bg, (0,0))
 
-	bird_group.draw(screen) #
-	bird_group.update() #
+	witch_group.draw(screen) #
+	witch_group.update() #
 
 	#draw and scroll the ground
 	for i in range(0, tiles):
