@@ -29,6 +29,8 @@ ground_scroll = 0
 scroll_speed = 4
 tiles = math.ceil(screen_width / ground_width) + 1
 print(tiles)
+flying = False
+game_over = False
 
 #สร้างตัวละคร
 class Witch(pygame.sprite.Sprite):
@@ -44,20 +46,38 @@ class Witch(pygame.sprite.Sprite):
 		self.image = self.images[self.index]
 		self.rect = self.image.get_rect()
 		self.rect.center = [x, y]
+		self.vel = 0
+		self.clicked = False
 
 	def update(self):
 
-		#handle the animation
-		self.counter += 1
-		flap_cooldown = 5
+		if flying == True:
+			#ทำให้มีแรงโน้มถ่วงให้ตัวละครร่วงลงมา
+			self.vel += 0.5
+			if self.vel > 8:
+				self.vel = 8
+			if self.rect.bottom < 768:
+				self.rect.y += int(self.vel)
+		if game_over == False:
+			#ทำให้ตัวละครกระโดดได้
+			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				self.clicked = True
+				self.vel = -10
+			if pygame.mouse.get_pressed()[0] == 0:
+				self.clicked = False
 
-		if self.counter > flap_cooldown:
-			self.counter = 0
-			self.index += 1
-			if self.index >= len(self.images):
-				self.index = 0
-		self.image = self.images[self.index]
+			#handle the animation
+			self.counter += 1
+			flap_cooldown = 5
 
+			if self.counter > flap_cooldown:
+				self.counter = 0
+				self.index += 1
+				if self.index >= len(self.images):
+					self.index = 0
+			self.image = self.images[self.index]
+		else:
+			self.image = pygame.transform.rotate(self.images[self.index], -90)
 
 witch_group = pygame.sprite.Group()
 
@@ -76,10 +96,16 @@ while run:
 
 	witch_group.draw(screen) #
 	witch_group.update() #
-
-	#draw and scroll the ground
-	for i in range(0, tiles):
-		screen.blit(ground_img, (i * ground_width + ground_scroll, 400))
+ 
+	#ตรวจสอบการโดนพื้นของตัวละคร
+	if flappy.rect.bottom > 768:
+		game_over = True
+		flying = False
+  
+	if game_over == False:
+		#draw and scroll the ground
+		for i in range(0, tiles):
+			screen.blit(ground_img, (i * ground_width + ground_scroll, 400))
 
 	#scroll ground_img
 	ground_scroll -= scroll_speed
@@ -92,6 +118,8 @@ while run:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			run = False
+		if event.type == pygame.MOUSEBUTTONDOWN and flying == False and game_over == False:
+			flying = True
 
 	pygame.display.update()
 #คำสั่งปิดการทำงานของpygame
