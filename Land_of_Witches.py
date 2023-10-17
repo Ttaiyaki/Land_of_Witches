@@ -21,12 +21,14 @@ pygame.display.set_caption('Land of Witches')
 
 #load images
 bg = pygame.image.load('img/bg.jpg')
-ground_img = pygame.image.load('img/dry_bush_ground_v2.png')
+ground_img = pygame.image.load('img/new_ground.png')
 ground_width = ground_img.get_width()
 
 #define game variables
 ground_scroll = 0
 scroll_speed = 4
+flying = False
+game_over = False
 tiles = math.ceil(screen_width / ground_width) + 1
 print(tiles)
 
@@ -44,20 +46,43 @@ class Witch(pygame.sprite.Sprite):
 		self.image = self.images[self.index]
 		self.rect = self.image.get_rect()
 		self.rect.center = [x, y]
+		self.vel = 0
+		self.clicked = False
 
 	def update(self):
+		if flying == True:
+			#gravity
+			self.vel += 0.5
+			#ถ้าโดดเกินความสูงของหน้าจอ8 จะโดดไม่สูงสุดเกิน 8
+			if self.vel > 8:
+				self.vel = 8
+			#ถ้าล้นลงเกินความสูงของหน้าจอ540 จะล้นไม่เกิน 540
+			if self.rect.bottom < 540:
+				self.rect.y += int(self.vel)
 
-		#handle the animation
-		self.counter += 1
-		flap_cooldown = 5
+		if game_over == False:
+			#กระโดด
+			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				self.clicked = True
+				self.vel = -10
+			if pygame.mouse.get_pressed()[0] == 0:
+				self.clicked = False
 
-		if self.counter > flap_cooldown:
-			self.counter = 0
-			self.index += 1
-			if self.index >= len(self.images):
-				self.index = 0
-		self.image = self.images[self.index]
+			#handle the animation
+			self.counter += 1
+			flap_cooldown = 5
 
+			if self.counter > flap_cooldown:
+				self.counter = 0
+				self.index += 1
+				if self.index >= len(self.images):
+					self.index = 0
+			self.image = self.images[self.index]
+		
+			#rotate the witch
+			self.image = pygame.transform.rotate(self.images[self.index], self.vel * -1)
+		else:
+			self.image = pygame.transform.rotate(self.images[self.index], -90)
 
 witch_group = pygame.sprite.Group()
 
@@ -77,21 +102,28 @@ while run:
 	witch_group.draw(screen) #
 	witch_group.update() #
 
-	#draw and scroll the ground
+#draw and scroll the ground
 	for i in range(0, tiles):
-		screen.blit(ground_img, (i * ground_width + ground_scroll, 400))
+		screen.blit(ground_img, (i * ground_width + ground_scroll, 540))
 
+	#check if witch hit the ground
+	if flappy.rect.bottom > 540:
+		game_over = True
+		flying = False
+
+	if game_over == False:
 	#scroll ground_img
-	ground_scroll -= scroll_speed
-
-	#reset scroll
-	if abs(ground_scroll) > ground_width:
-		ground_scroll = 0
+		ground_scroll -= scroll_speed
+		#reset scroll
+		if abs(ground_scroll) > ground_width:
+			ground_scroll = 0
 
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			run = False
+		if event.type == pygame.MOUSEBUTTONDOWN and flying == False and game_over == False:
+			flying = True
 
 	pygame.display.update()
 #คำสั่งปิดการทำงานของpygame
