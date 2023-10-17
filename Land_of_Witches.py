@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 import math
+import random
+
 #เรียกlibraryเริ่มต้นทำงาน
 pygame.init()
 
@@ -29,6 +31,10 @@ ground_scroll = 0
 scroll_speed = 4
 flying = False
 game_over = False
+obstable_gap = 150
+obstacle_frequency = 1500 #milliseconds
+last_obstacle = pygame.time.get_ticks() - obstacle_frequency
+
 tiles = math.ceil(screen_width / ground_width) + 1
 print(tiles)
 
@@ -64,7 +70,7 @@ class Witch(pygame.sprite.Sprite):
 			#กระโดด
 			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
 				self.clicked = True
-				self.vel = -10
+				self.vel = -7
 			if pygame.mouse.get_pressed()[0] == 0:
 				self.clicked = False
 
@@ -84,12 +90,31 @@ class Witch(pygame.sprite.Sprite):
 		else:
 			self.image = pygame.transform.rotate(self.images[self.index], -90)
 
+
+class Obstacle(pygame.sprite.Sprite):
+	def __init__(self, x, y, position):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load('img/pipe.png')
+		self.rect = self.image.get_rect()
+		#position 1 is from the top(อุปสรรคอยู่ด้านบน), -1 is from the bottom(อุปสรรคอยู่ด้านล่าง)
+		if position == 1:
+			self.image = pygame.transform.flip(self.image, False, True)
+			self.rect.bottomleft = [x, y - int(obstable_gap / 2)]
+		if position == -1:
+			self.rect.topleft = [x, y + int(obstable_gap / 2)]
+
+	def update(self):
+		self.rect.x -= scroll_speed
+		if self.rect.right < 0:
+			self.kill()
+
 witch_group = pygame.sprite.Group()
+obstacle_group = pygame.sprite.Group()
+
 
 flappy = Witch(100, int(screen_height / 2))
 
 witch_group.add(flappy)
-
 
 run = True
 while run:
@@ -101,23 +126,39 @@ while run:
 
 	witch_group.draw(screen) #
 	witch_group.update() #
+	obstacle_group.draw(screen) #
 
-#draw and scroll the ground
+	#draw and scroll the ground
 	for i in range(0, tiles):
 		screen.blit(ground_img, (i * ground_width + ground_scroll, 540))
 
+	#look for collision
+	if pygame.sprite.groupcollide(witch_group, obstacle_group, False, False) or flappy.rect.top < 0:
+		game_over = True
+
 	#check if witch hit the ground
-	if flappy.rect.bottom > 540:
+	if flappy.rect.bottom >= 540:
 		game_over = True
 		flying = False
 
-	if game_over == False:
-	#scroll ground_img
+	if game_over == False and flying == True:
+		#generate new obstacles
+		time_now = pygame.time.get_ticks()
+		if time_now - last_obstacle > obstacle_frequency:
+			obstacle_height = random.randint(-100, 100)
+			btm_obstacle = Obstacle(screen_width, int(screen_height / 2) + obstacle_height, -1)
+			top_obstacle = Obstacle(screen_width, int(screen_height / 2) + obstacle_height, 1)
+			obstacle_group.add(btm_obstacle)
+			obstacle_group.add(top_obstacle)
+			last_obstacle = time_now
+
+		#scroll ground_img
 		ground_scroll -= scroll_speed
 		#reset scroll
 		if abs(ground_scroll) > ground_width:
 			ground_scroll = 0
 
+		obstacle_group.update() #
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
