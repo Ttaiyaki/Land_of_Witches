@@ -21,12 +21,20 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 #titleหน้าจอ
 pygame.display.set_caption('Land of Witches')
 
-#load images
+#โหลดรูปภาพ
 bg = pygame.image.load('img/bg.jpg')
 ground_img = pygame.image.load('img/new_ground.png')
 ground_width = ground_img.get_width()
 
-#define game variables
+
+#ตัวแปรกำหนดฟอนต์และขนาด (Fonts and Size)
+font = pygame.font.SysFont('Bauhaus 93', 60)
+
+#ตัวแปรกำหนดสีฟอนต์ (Font's color)
+white = (255, 255, 255)
+
+
+#กำหนดตัวแปรภายในเกม
 ground_scroll = 0
 scroll_speed = 4
 flying = False
@@ -35,8 +43,20 @@ obstable_gap = 150
 obstacle_frequency = 1500 #milliseconds
 last_obstacle = pygame.time.get_ticks() - obstacle_frequency
 
+#การตั้งค่าคะแนนให้เป็น 0 ตอนแรกเริ่ม 
+#และเพิ่มตัว trigger เข้ามาสำหรับการนับคะแนน
+score = 0
+pass_pipe = False
+
+
 tiles = math.ceil(screen_width / ground_width) + 1
 print(tiles)
+
+#Function ฟอนต์ (Font) 
+def draw_text(text, font, text_col, x, y):
+	img = font.render(text, True, text_col)
+	screen.blit(img, (x, y))
+
 
 #สร้างตัวละคร
 class Witch(pygame.sprite.Sprite):
@@ -91,7 +111,7 @@ class Witch(pygame.sprite.Sprite):
 			self.image = pygame.transform.rotate(self.images[self.index], -90)
 
 
-class Obstacle(pygame.sprite.Sprite):
+class obstacle(pygame.sprite.Sprite):
 	def __init__(self, x, y, position):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load('img/pipe.png')
@@ -132,6 +152,22 @@ while run:
 	for i in range(0, tiles):
 		screen.blit(ground_img, (i * ground_width + ground_scroll, 540))
 
+	#การเช็คคะแนน
+	#โดยการเช็คจะแนนจะเริ่มทำงานตอนที่มีอุปสรรคปรากฎขึ้นมาบนจอของผู้เล่น
+	if len(obstacle_group) > 0:
+		#เป็นการเช็คว่าตัวของแม่มดเคลื่อนที่ถึงตัวอุปสรรคแล้วหรือยัง
+		if witch_group.sprites()[0].rect.right < obstacle_group.sprites()[0].rect.right\
+			and pass_pipe == False:
+			pass_pipe = True
+		if pass_pipe == True:
+			#แต่ตัวคะแนนจะนับเพิ่ม 1คะแนน ก็ต่อเมื่อระยะทางด้านซ้ายของตัวแม่มดนั้นเคลื่อนผ่านบริเวณด้านขวาของตัวอุปสรรคแล้วเท่านั้น
+			if witch_group.sprites()[0].rect.left > obstacle_group.sprites()[0].rect.right:
+				score += 1
+				pass_pipe = False
+
+	#ตำแหน่งของฟอนต์ (Font's position)
+	draw_text(str(score), font, white, int(screen_width / 2), 20)
+
 	#look for collision
 	if pygame.sprite.groupcollide(witch_group, obstacle_group, False, False) or flappy.rect.top < 0:
 		game_over = True
@@ -146,8 +182,8 @@ while run:
 		time_now = pygame.time.get_ticks()
 		if time_now - last_obstacle > obstacle_frequency:
 			obstacle_height = random.randint(-100, 100)
-			btm_obstacle = Obstacle(screen_width, int(screen_height / 2) + obstacle_height, -1)
-			top_obstacle = Obstacle(screen_width, int(screen_height / 2) + obstacle_height, 1)
+			btm_obstacle = obstacle(screen_width, int(screen_height / 2) + obstacle_height, -1)
+			top_obstacle = obstacle(screen_width, int(screen_height / 2) + obstacle_height, 1)
 			obstacle_group.add(btm_obstacle)
 			obstacle_group.add(top_obstacle)
 			last_obstacle = time_now
