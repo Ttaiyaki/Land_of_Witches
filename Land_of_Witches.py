@@ -114,7 +114,7 @@ class Witch(pygame.sprite.Sprite):
 class obstacle(pygame.sprite.Sprite):
 	def __init__(self, x, y, position):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load('img/pipe.png')
+		self.image = pygame.image.load('img/wood.png')
 		self.rect = self.image.get_rect()
 		#position 1 is from the top(อุปสรรคอยู่ด้านบน), -1 is from the bottom(อุปสรรคอยู่ด้านล่าง)
 		if position == 1:
