@@ -143,7 +143,7 @@ class Button():
     def draw(self):
         action = False
         #ตำแหน่งของmouse
-        pos = pygame.mouse.get_pos()[0]
+        pos = pygame.mouse.get_pos()
         
         #check ว่า mouse อยู่ตรงปุ่มไหม
         if self.rect.collidepoint(pos):
@@ -164,7 +164,7 @@ flappy = Witch(100, int(screen_height / 2))
 witch_group.add(flappy)
 
 #สร้างปุ่ม restart
-button = Button(screen_width // 2 - 50, screen_height // 2 - 100, button_img)
+button = Button(screen_width // 3 - 40, screen_height // 3 - 20, button_img)
 
 run = True
 while run:
