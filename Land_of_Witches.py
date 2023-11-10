@@ -59,7 +59,7 @@ def draw_text(text, font, text_col, x, y):
 	screen.blit(img, (x, y))
 
 def reset_game():
-    pipe_group.empty()
+    obstacle_group.empty()
     flappy.rect.x = 100
     flappy.rect.y = int(screen_height / 2)
     score = 0
