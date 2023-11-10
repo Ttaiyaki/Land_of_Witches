@@ -25,7 +25,8 @@ pygame.display.set_caption('Land of Witches')
 bg = pygame.image.load('img/bg.jpg')
 ground_img = pygame.image.load('img/new_ground.png')
 ground_width = ground_img.get_width()
-button_img = pygame.image.load('img/restart.png')
+re_button_img = pygame.image.load('img/restart.png')
+over_button_img = pygame.image.load('img/imggameover.png')
 
 
 #ตัวแปรกำหนดฟอนต์และขนาด (Fonts and Size)
@@ -163,8 +164,11 @@ flappy = Witch(100, int(screen_height / 2))
 
 witch_group.add(flappy)
 
+#สร้างปุ่ม game over
+button = Button(screen_width // 2 - 100, screen_height // 2 - 100, over_button_img)
+
 #สร้างปุ่ม restart
-button = Button(screen_width // 3 - 40, screen_height // 3 - 20, button_img)
+button = Button(screen_width // 3 - 40, screen_height // 2 - 10, re_button_img)
 
 run = True
 while run:
