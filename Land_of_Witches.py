@@ -165,10 +165,10 @@ flappy = Witch(100, int(screen_height / 2))
 witch_group.add(flappy)
 
 #สร้างปุ่ม game over
-button = Button(screen_width // 2 - 100, screen_height // 2 - 100, over_button_img)
+button_gameover = Button(screen_width // 2 - 240, screen_height // 2 - 240, over_button_img)
 
 #สร้างปุ่ม restart
-button = Button(screen_width // 3 - 40, screen_height // 2 - 10, re_button_img)
+button_restart = Button(screen_width // 3 - 40, screen_height // 2 - 40, re_button_img)
 
 run = True
 while run:
@@ -232,7 +232,8 @@ while run:
   
 	#check ว่า game over แล้ว reset
 	if game_over == True:
-		if button.draw() == True:
+		button_gameover.draw()
+		if button_restart.draw() == True:
 			game_over = False
 			score = reset_game()
  
