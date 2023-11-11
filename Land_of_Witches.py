@@ -165,10 +165,10 @@ flappy = Witch(100, int(screen_height / 2))
 witch_group.add(flappy)
 
 #สร้างปุ่ม game over
-button_gameover = Button(screen_width // 2 - 240, screen_height // 2 - 240, over_button_img)
+button_gameover = Button(screen_width // 2 - 410, screen_height // 2 - 180, over_button_img)
 
 #สร้างปุ่ม restart
-button_restart = Button(screen_width // 3 - 40, screen_height // 2 - 40, re_button_img)
+button_restart = Button(screen_width // 3 - (-40), screen_height // 1 - 200, re_button_img)
 
 run = True
 while run:
