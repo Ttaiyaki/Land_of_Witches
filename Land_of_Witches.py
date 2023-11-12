@@ -27,6 +27,7 @@ ground_img = pygame.image.load('img/new_ground.png')
 ground_width = ground_img.get_width()
 re_button_img = pygame.image.load('img/restart.png')
 over_button_img = pygame.image.load('img/imggameover.png')
+start_button_img = pygame.image.load('img/start.png')
 
 
 #ตัวแปรกำหนดฟอนต์และขนาด (Fonts and Size)
@@ -164,6 +165,9 @@ flappy = Witch(100, int(screen_height / 2))
 
 witch_group.add(flappy)
 
+#สร้างปุ่ม start
+button_start = Button(screen_width // 2 - 190, screen_height // 2 - 100, start_button_img)
+
 #สร้างปุ่ม game over
 button_gameover = Button(screen_width // 2 - 410, screen_height // 2 - 180, over_button_img)
 
@@ -172,77 +176,89 @@ button_restart = Button(screen_width // 3 - (-40), screen_height // 1 - 200, re_
 
 run = True
 while run:
-    #กำหนดอัตราการแสดงผล fps = 60 frame / 1 second
-	clock.tick(fps)
-
-	#draw background
 	screen.blit(bg, (0,0))
+	button_start.draw()
 
-	witch_group.draw(screen) #
-	witch_group.update() #
-	obstacle_group.draw(screen) #
-
-	#draw and scroll the ground
-	for i in range(0, tiles):
-		screen.blit(ground_img, (i * ground_width + ground_scroll, 540))
-
-	#การเช็คคะแนน
-	#โดยการเช็คจะแนนจะเริ่มทำงานตอนที่มีอุปสรรคปรากฎขึ้นมาบนจอของผู้เล่น
-	if len(obstacle_group) > 0:
-		#เป็นการเช็คว่าตัวของแม่มดเคลื่อนที่ถึงตัวอุปสรรคแล้วหรือยัง
-		if witch_group.sprites()[0].rect.right < obstacle_group.sprites()[0].rect.right\
-			and pass_pipe == False:
-			pass_pipe = True
-		if pass_pipe == True:
-			#แต่ตัวคะแนนจะนับเพิ่ม 1คะแนน ก็ต่อเมื่อระยะทางด้านซ้ายของตัวแม่มดนั้นเคลื่อนผ่านบริเวณด้านขวาของตัวอุปสรรคแล้วเท่านั้น
-			if witch_group.sprites()[0].rect.left > obstacle_group.sprites()[0].rect.right:
-				score += 1
-				pass_pipe = False
-
-	#ตำแหน่งของฟอนต์ (Font's position)
-	draw_text(str(score), font, white, int(screen_width / 2), 20)
-
-	#look for collision
-	if pygame.sprite.groupcollide(witch_group, obstacle_group, False, False) or flappy.rect.top < 0:
-		game_over = True
-
-	#check if witch hit the ground
-	if flappy.rect.bottom >= 540:
-		game_over = True
-		flying = False
-
-	if game_over == False and flying == True:
-		#generate new obstacles
-		time_now = pygame.time.get_ticks()
-		if time_now - last_obstacle > obstacle_frequency:
-			obstacle_height = random.randint(-100, 100)
-			btm_obstacle = obstacle(screen_width, int(screen_height / 2) + obstacle_height, -1)
-			top_obstacle = obstacle(screen_width, int(screen_height / 2) + obstacle_height, 1)
-			obstacle_group.add(btm_obstacle)
-			obstacle_group.add(top_obstacle)
-			last_obstacle = time_now
-
-		#scroll ground_img
-		ground_scroll -= scroll_speed
-		#reset scroll
-		if abs(ground_scroll) > ground_width:
-			ground_scroll = 0
-
-		obstacle_group.update()
-  
-	#check ว่า game over แล้ว reset
-	if game_over == True:
-		button_gameover.draw()
-		if button_restart.draw() == True:
-			game_over = False
-			score = reset_game()
- 
 	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			run = False
-		if event.type == pygame.MOUSEBUTTONDOWN and flying == False and game_over == False:
-			flying = True
+		#คำสั่งปิดการทำงานของpygame
+		if event.type == QUIT:
+			pygame.quit()
 
+		#เมื่อกดปุ่ม start จะเริ่มเล่นเกม
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if button_start.draw() == True:
+				run = True
+				while run:
+					#กำหนดอัตราการแสดงผล fps = 60 frame / 1 second
+					clock.tick(fps)
+
+					#draw background
+					screen.blit(bg, (0,0))
+
+					witch_group.draw(screen) #
+					witch_group.update() #
+					obstacle_group.draw(screen) #
+
+					#draw and scroll the ground
+					for i in range(0, tiles):
+						screen.blit(ground_img, (i * ground_width + ground_scroll, 540))
+
+					#การเช็คคะแนน
+					#โดยการเช็คจะแนนจะเริ่มทำงานตอนที่มีอุปสรรคปรากฎขึ้นมาบนจอของผู้เล่น
+					if len(obstacle_group) > 0:
+						#เป็นการเช็คว่าตัวของแม่มดเคลื่อนที่ถึงตัวอุปสรรคแล้วหรือยัง
+						if witch_group.sprites()[0].rect.right < obstacle_group.sprites()[0].rect.right\
+							and pass_pipe == False:
+							pass_pipe = True
+						if pass_pipe == True:
+							#แต่ตัวคะแนนจะนับเพิ่ม 1คะแนน ก็ต่อเมื่อระยะทางด้านซ้ายของตัวแม่มดนั้นเคลื่อนผ่านบริเวณด้านขวาของตัวอุปสรรคแล้วเท่านั้น
+							if witch_group.sprites()[0].rect.left > obstacle_group.sprites()[0].rect.right:
+								score += 1
+								pass_pipe = False
+
+					#ตำแหน่งของฟอนต์ (Font's position)
+					draw_text(str(score), font, white, int(screen_width / 2), 20)
+
+					#look for collision
+					if pygame.sprite.groupcollide(witch_group, obstacle_group, False, False) or flappy.rect.top < 0:
+						game_over = True
+
+					#check if witch hit the ground
+					if flappy.rect.bottom >= 540:
+						game_over = True
+						flying = False
+
+					if game_over == False and flying == True:
+						#generate new obstacles
+						time_now = pygame.time.get_ticks()
+						if time_now - last_obstacle > obstacle_frequency:
+							obstacle_height = random.randint(-100, 100)
+							btm_obstacle = obstacle(screen_width, int(screen_height / 2) + obstacle_height, -1)
+							top_obstacle = obstacle(screen_width, int(screen_height / 2) + obstacle_height, 1)
+							obstacle_group.add(btm_obstacle)
+							obstacle_group.add(top_obstacle)
+							last_obstacle = time_now
+
+						#scroll ground_img
+						ground_scroll -= scroll_speed
+						#reset scroll
+						if abs(ground_scroll) > ground_width:
+							ground_scroll = 0
+
+						obstacle_group.update()
+				
+					#check ว่า game over แล้ว reset
+					if game_over == True:
+						button_gameover.draw()
+						if button_restart.draw() == True:
+							game_over = False
+							score = reset_game()
+				
+					for event in pygame.event.get():
+						if event.type == pygame.QUIT:
+							run = False
+						if event.type == pygame.MOUSEBUTTONDOWN and flying == False and game_over == False:
+							flying = True
+
+					pygame.display.update()
 	pygame.display.update()
-#คำสั่งปิดการทำงานของpygame
-pygame.quit()
