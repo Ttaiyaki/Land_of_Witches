@@ -29,6 +29,12 @@ re_button_img = pygame.image.load('img/restart.png')
 over_button_img = pygame.image.load('img/imggameover.png')
 start_button_img = pygame.image.load('img/start.png')
 
+#เพิ่มเสียง
+bgm_sound = pygame.mixer.music.load('sound/ghost-waltz-120538.mp3')
+pygame.mixer.music.play(-1)
+jump_sfx = pygame.mixer.Sound('sound/jumping-2043.wav')
+over_sfx = pygame.mixer.Sound('sound/game-over-213.wav')
+restart_sfx = pygame.mixer.Sound('sound/restart-212.wav')
 
 #ตัวแปรกำหนดฟอนต์และขนาด (Fonts and Size)
 font = pygame.font.SysFont('Bauhaus 93', 60)
@@ -42,6 +48,7 @@ ground_scroll = 0
 scroll_speed = 4
 flying = False
 game_over = False
+hasPlayedGameOverSound = False
 obstable_gap = 150
 obstacle_frequency = 1500 #milliseconds
 last_obstacle = pygame.time.get_ticks() - obstacle_frequency
@@ -100,6 +107,7 @@ class Witch(pygame.sprite.Sprite):
 			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
 				self.clicked = True
 				self.vel = -7
+				jump_sfx.play()
 			if pygame.mouse.get_pressed()[0] == 0:
 				self.clicked = False
 
@@ -188,6 +196,7 @@ while run:
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			if button_start.draw() == True:
 				run = True
+
 				while run:
 					#กำหนดอัตราการแสดงผล fps = 60 frame / 1 second
 					clock.tick(fps)
@@ -249,10 +258,15 @@ while run:
 				
 					#check ว่า game over แล้ว reset
 					if game_over == True:
+						if not hasPlayedGameOverSound:
+							over_sfx.play()
+							hasPlayedGameOverSound = True
 						button_gameover.draw()
 						if button_restart.draw() == True:
 							game_over = False
 							score = reset_game()
+							restart_sfx.play()
+							hasPlayedGameOverSound = False
 				
 					for event in pygame.event.get():
 						if event.type == pygame.QUIT:
