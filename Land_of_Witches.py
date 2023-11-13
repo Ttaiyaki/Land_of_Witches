@@ -31,6 +31,7 @@ start_button_img = pygame.image.load('img/start.png')
 
 #เพิ่มเสียง
 bgm_sound = pygame.mixer.music.load('sound/ghost-waltz-120538.mp3')
+pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
 jump_sfx = pygame.mixer.Sound('sound/jumping-2043.wav')
 over_sfx = pygame.mixer.Sound('sound/game-over-213.wav')
