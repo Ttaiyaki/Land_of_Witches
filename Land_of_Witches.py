@@ -61,7 +61,7 @@ pass_pipe = False
 
 
 tiles = math.ceil(screen_width / ground_width) + 1
-print(tiles)
+
 
 #Function ฟอนต์ (Font) 
 def draw_text(text, font, text_col, x, y):
@@ -74,7 +74,7 @@ def reset_game():
     flappy.rect.y = int(screen_height / 2)
     score = 0
     return score
-    
+
 #สร้างตัวละคร
 class Witch(pygame.sprite.Sprite):
 	def __init__(self, x, y):
@@ -122,7 +122,7 @@ class Witch(pygame.sprite.Sprite):
 				if self.index >= len(self.images):
 					self.index = 0
 			self.image = self.images[self.index]
-		
+
 			#rotate the witch
 			self.image = pygame.transform.rotate(self.images[self.index], self.vel * -1)
 		else:
@@ -155,7 +155,7 @@ class Button():
         action = False
         #ตำแหน่งของmouse
         pos = pygame.mouse.get_pos()
-        
+
         #check ว่า mouse อยู่ตรงปุ่มไหม
         if self.rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1:
@@ -196,7 +196,7 @@ while run:
 		#เมื่อกดปุ่ม start จะเริ่มเล่นเกม
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			if button_start.draw() == True:
-				run = True
+
 
 				while run:
 					#กำหนดอัตราการแสดงผล fps = 60 frame / 1 second
@@ -256,7 +256,7 @@ while run:
 							ground_scroll = 0
 
 						obstacle_group.update()
-				
+
 					#check ว่า game over แล้ว reset
 					if game_over == True:
 						if not hasPlayedGameOverSound:
@@ -268,7 +268,7 @@ while run:
 							score = reset_game()
 							restart_sfx.play()
 							hasPlayedGameOverSound = False
-				
+
 					for event in pygame.event.get():
 						if event.type == pygame.QUIT:
 							run = False
